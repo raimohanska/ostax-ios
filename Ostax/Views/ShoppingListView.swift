@@ -6,6 +6,7 @@ struct ShoppingListView: View {
     let dispatch: Dispatch
     
     @State private var newItemName = ""
+    @State private var selected: ShoppingItem?
     
     func addItem() {
         dispatch(.AddItem(
@@ -22,11 +23,23 @@ struct ShoppingListView: View {
             }.padding(EdgeInsets(top: 0, leading: 0, bottom: 8, trailing: 0))
             VStack(alignment: .leading) {
                 ForEach(list.items) { item in
-                    Text(item.name).padding(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
+                    HStack {
+                        Text(item.name)
+                            .padding(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
+                            .onTapGesture {
+                                selected = item
+                            }
+                        if (selected == item) {
+                            Button(action: { dispatch(.DeleteItem(listId: list.id, itemId: item.id)) }) {
+                                Label("", systemImage: "trash")
+                            }.frame(alignment: .trailing)
+                        }
+                    }
                 }
                 HStack() {
                     TextField("Add new item", text: $newItemName)
                         .onSubmit(addItem)
+                        .padding(EdgeInsets(top: 4, leading: 0, bottom: 2, trailing: 0))
 
                     Button(action: addItem, label: { Image(systemName: "plus") })
                         .disabled(newItemName.isEmpty)
