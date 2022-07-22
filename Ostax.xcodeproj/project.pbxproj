@@ -11,11 +11,13 @@
 		5B092F3328899D4C00D938B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B092F3228899D4C00D938B9 /* Assets.xcassets */; };
 		5B092F3628899D4C00D938B9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B092F3528899D4C00D938B9 /* Preview Assets.xcassets */; };
 		5B092F4528899E3000D938B9 /* ShoppingListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F4428899E3000D938B9 /* ShoppingListsView.swift */; };
-		5B092F4928899E4300D938B9 /* WebSocketStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F4628899E4300D938B9 /* WebSocketStream.swift */; };
 		5B092F4A28899E4300D938B9 /* SocketIOConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F4728899E4300D938B9 /* SocketIOConnection.swift */; };
 		5B092F4B28899E4300D938B9 /* ShoppingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F4828899E4300D938B9 /* ShoppingListView.swift */; };
 		5B092F4E28899E8F00D938B9 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 5B092F4D28899E8F00D938B9 /* SocketIO */; };
 		5B092F50288A6DC200D938B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F4F288A6DC200D938B9 /* LoginView.swift */; };
+		5B092F76288A82E200D938B9 /* ShoppingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F75288A82E200D938B9 /* ShoppingList.swift */; };
+		5B092F78288A830100D938B9 /* AppEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F77288A830100D938B9 /* AppEvent.swift */; };
+		5B092F7A288A8BC100D938B9 /* ShoppingListsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F79288A8BC100D938B9 /* ShoppingListsModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,11 +25,13 @@
 		5B092F2E28899D4A00D938B9 /* OstaxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OstaxApp.swift; sourceTree = "<group>"; };
 		5B092F3228899D4C00D938B9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5B092F3528899D4C00D938B9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		5B092F4428899E3000D938B9 /* ShoppingListsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShoppingListsView.swift; path = Ostax/ShoppingListsView.swift; sourceTree = SOURCE_ROOT; };
-		5B092F4628899E4300D938B9 /* WebSocketStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocketStream.swift; sourceTree = "<group>"; };
+		5B092F4428899E3000D938B9 /* ShoppingListsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShoppingListsView.swift; path = Ostax/Views/ShoppingListsView.swift; sourceTree = SOURCE_ROOT; };
 		5B092F4728899E4300D938B9 /* SocketIOConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketIOConnection.swift; sourceTree = "<group>"; };
 		5B092F4828899E4300D938B9 /* ShoppingListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppingListView.swift; sourceTree = "<group>"; };
 		5B092F4F288A6DC200D938B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		5B092F75288A82E200D938B9 /* ShoppingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingList.swift; sourceTree = "<group>"; };
+		5B092F77288A830100D938B9 /* AppEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEvent.swift; sourceTree = "<group>"; };
+		5B092F79288A8BC100D938B9 /* ShoppingListsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListsModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,14 +65,12 @@
 		5B092F2D28899D4A00D938B9 /* Ostax */ = {
 			isa = PBXGroup;
 			children = (
+				5B092F74288A82CE00D938B9 /* Models */,
+				5B092F73288A828D00D938B9 /* Views */,
 				5B092F2E28899D4A00D938B9 /* OstaxApp.swift */,
 				5B092F3228899D4C00D938B9 /* Assets.xcassets */,
-				5B092F4428899E3000D938B9 /* ShoppingListsView.swift */,
-				5B092F4828899E4300D938B9 /* ShoppingListView.swift */,
 				5B092F4728899E4300D938B9 /* SocketIOConnection.swift */,
-				5B092F4628899E4300D938B9 /* WebSocketStream.swift */,
 				5B092F3428899D4C00D938B9 /* Preview Content */,
-				5B092F4F288A6DC200D938B9 /* LoginView.swift */,
 			);
 			path = Ostax;
 			sourceTree = "<group>";
@@ -79,6 +81,26 @@
 				5B092F3528899D4C00D938B9 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		5B092F73288A828D00D938B9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5B092F4428899E3000D938B9 /* ShoppingListsView.swift */,
+				5B092F4828899E4300D938B9 /* ShoppingListView.swift */,
+				5B092F4F288A6DC200D938B9 /* LoginView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5B092F74288A82CE00D938B9 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5B092F75288A82E200D938B9 /* ShoppingList.swift */,
+				5B092F77288A830100D938B9 /* AppEvent.swift */,
+				5B092F79288A8BC100D938B9 /* ShoppingListsModel.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -157,12 +179,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B092F78288A830100D938B9 /* AppEvent.swift in Sources */,
 				5B092F50288A6DC200D938B9 /* LoginView.swift in Sources */,
+				5B092F76288A82E200D938B9 /* ShoppingList.swift in Sources */,
+				5B092F7A288A8BC100D938B9 /* ShoppingListsModel.swift in Sources */,
 				5B092F4B28899E4300D938B9 /* ShoppingListView.swift in Sources */,
 				5B092F4A28899E4300D938B9 /* SocketIOConnection.swift in Sources */,
 				5B092F4528899E3000D938B9 /* ShoppingListsView.swift in Sources */,
 				5B092F2F28899D4A00D938B9 /* OstaxApp.swift in Sources */,
-				5B092F4928899E4300D938B9 /* WebSocketStream.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

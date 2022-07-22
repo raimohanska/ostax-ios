@@ -1,32 +1,7 @@
 import Foundation
 import SocketIO
+import Combine
 
-struct ShoppingItem: Codable, Identifiable {
-    var id: String
-    var name: String
-}
-
-struct ShoppingList: Codable, Identifiable {
-    var id: String
-    var name: String
-    var items: [ShoppingItem]
-}
-
-enum AppEvent {
-    case ListsInit(lists: [ShoppingList])
-    case SuggestionsUpdate
-    case AddItem(listId: String, item: ShoppingItem)
-    case DeleteItem(listId: String, itemId: String)
-}
-
-extension AppEvent: Codable {
-    enum CodingKeys: String, CodingKey {
-        case ListsInit = "lists.init"
-        case SuggestionsUpdate = "suggestions.update"
-        case AddItem = "item.add"
-        case DeleteItem = "item.delete"
-    }
-}
 typealias Dispatch = (AppEvent) -> ()
 
 extension Encodable {
@@ -45,7 +20,6 @@ protocol LoginController {
 }
 
 class SocketIOConnection: ObservableObject, LoginController {
-    @Published var lists: [ShoppingList] = []
     private let manager: SocketManager
     @Published var sessionToken: String? = UserDefaults.standard.string(forKey: "sessionToken") {
         didSet {
@@ -54,6 +28,7 @@ class SocketIOConnection: ObservableObject, LoginController {
     }
     private let socket: SocketIOClient
     var loggedIn: Bool = false
+    let appEvents = PassthroughSubject<AppEvent, Never>()
     
     func emailLogin(email: String) {
         socket.emit("message", "auth-request", [
@@ -69,12 +44,7 @@ class SocketIOConnection: ObservableObject, LoginController {
             "code": code
         ])
     }
-    
-    func dispatch(_ event: AppEvent) {
-        print("Dispatching \(event)")
-        sendEvent(event)
-        applyEvent(event)
-    }
+
     
     func sendEvent(_ event: AppEvent) {
         do {
@@ -89,27 +59,7 @@ class SocketIOConnection: ObservableObject, LoginController {
             print("### Failed to serialize \(event): \(error)")
         }
     }
-    
-    func applyEvent(_ event: AppEvent) {
-        switch (event) {
-            case .AddItem(listId: let listId, item: let newItem):
-                modifyListItems(listId, fn: { $0 + [newItem] })
-            case .DeleteItem(listId: let listId, itemId: let itemId):
-                modifyListItems(listId, fn: { $0.filter { $0.id != itemId } })
-            case .ListsInit(lists: let lists):
-                self.lists = lists
-                print("Lists received \(lists)")
-            default:
-                print("Ignoring AppEvent \(event) for now")
-        }
-        
-        func modifyListItems(_ listId: String, fn: ([ShoppingItem]) -> [ShoppingItem]) {
-            lists = lists.map { list in
-                list.id == listId ? ShoppingList(id: list.id, name: list.name, items: fn(list.items)) : list
-            }
-        }
-    }
-        
+
     init() {
         print("*** Initializing SocketIO")
         manager = SocketManager(socketURL: URL(string: "https://ostax.herokuapp.com/")!, config: [.log(true), .compress, .forceWebsockets(true)])
@@ -167,7 +117,7 @@ class SocketIOConnection: ObservableObject, LoginController {
                     // Funny conversion to JSON data first before decode
                     let data = try JSONSerialization.data(withJSONObject: withNestedStructure, options: .prettyPrinted)
                     let appEvent: AppEvent = try JSONDecoder().decode(AppEvent.self, from: data)
-                    applyEvent(appEvent)
+                    appEvents.send(appEvent)
                 } catch let error {
                     print("Error decoding App event \(withNestedStructure): \(error)")
                 }
