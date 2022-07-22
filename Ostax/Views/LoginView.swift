@@ -1,49 +1,43 @@
 import SwiftUI
 
-struct LoginView: View {
-    var loginModel: LoginModel
-    @State var emailValue = ""
-    @State var sendingEmail = false
-    @State var codeValue = ""
-    @State var sendingCode = false
+struct LoginView<Model : LoginModel>: View {
+    @ObservedObject var loginModel: Model
     
     var body: some View {
-        if (loginModel.state == .LoggingIn) {
+        if loginModel.state == .LoggingIn || loginModel.state == .VerifyingEmailCode {
             Text("Logging in...")
+        } else if loginModel.state == .LoginFailed {
+            Text("Login failed")
+            Button("Try again") {
+                loginModel.restart()
+            }
         } else {
             VStack(alignment: .center) {
                 Text("Welcome, stranger!")
                 VStack() {
                     Text("1. Enter your email to get started")
                     
-                    TextField("Email address", text: $emailValue)
+                    TextField("Email address", text: $loginModel.email)
                         .keyboardType(.emailAddress)
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: 150)
                         .onSubmit {
-                            loginModel.emailLogin(email: emailValue)
-                            sendingEmail = true
+                            loginModel.emailLogin()
                         }
 
-                }.disabled(sendingEmail)
-                if (sendingEmail) {
+                }.disabled(loginModel.state != .None)
+                if (loginModel.state == .EmailCodeSent) {
                     VStack {
                         Text("2. Enter the 6-digit code from email")
-                        TextField("000000", text: $codeValue)
+                        TextField("000000", text: $loginModel.code)
                             .keyboardType(.numberPad)
                             .textFieldStyle(.roundedBorder)
-                            .onChange(of: codeValue) { newValue in
-                                if (codeValue.count == 6) {
-                                    loginModel.codeLogin(email: emailValue, code: codeValue)
-                                    sendingCode = true
+                            .onChange(of: loginModel.code) { newValue in
+                                if (loginModel.code.count == 6) {
+                                    loginModel.codeLogin()
                                 }
                             }
-                    }.disabled(sendingCode)
-                }
-                if (sendingCode) {
-                    VStack {
-                        Text("3. Wait a minute...")
-                    }
+                    }.disabled(loginModel.state == .VerifyingEmailCode)
                 }
             }.frame(maxWidth: 250)
         }
@@ -54,11 +48,18 @@ struct LoginView: View {
 struct LoginView_Previews: PreviewProvider {
     class MockLoginModel: LoginModel {
         var state: LoginState = .None
-        func codeLogin(email: String, code: String) {
+        var email: String = ""
+        var code: String = ""
+        
+        func restart() {
             
         }
         
-        func emailLogin(email: String) {
+        func codeLogin() {
+            
+        }
+        
+        func emailLogin() {
             
         }
     }

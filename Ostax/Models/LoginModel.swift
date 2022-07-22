@@ -1,25 +1,27 @@
-//
-//  LoginModel.swift
-//  Ostax
-//
-//  Created by Juha Paananen on 22.7.2022.
-//
-
 import Foundation
 import Combine
 
-protocol LoginModel {
+protocol LoginModel: ObservableObject {
     var state: LoginState { get }
-    func emailLogin(email: String)
-    func codeLogin(email: String, code: String)
+    var email: String { get set }
+    var code: String { get set }
+    func restart()
+    func emailLogin()
+    func codeLogin()
 }
 
 enum LoginState {
-    case None, LoggingIn, LoggedIn
+    case None, LoggingIn, EmailCodeSent, VerifyingEmailCode, LoggedIn, LoginFailed
 }
 
 class RemoteLoginModel: ObservableObject, LoginModel {
     @Published var state: LoginState
+    @Published var email: String = UserDefaults.standard.string(forKey: "email") ?? "" {
+        didSet {
+            UserDefaults.standard.set(email, forKey: "email")
+        }
+    }
+    @Published var code: String = ""
 
     private let connection: SocketIOConnection
     private var cancelable: Cancellable?
@@ -38,12 +40,19 @@ class RemoteLoginModel: ObservableObject, LoginModel {
         })
     }
     
-    func emailLogin(email: String) {
-        connection.sendEvent(AuthRequest.EmailLogin(email: email))
+    func restart() {
+        code = ""
+        state = .None
     }
     
-    func codeLogin(email: String, code: String) {
+    func emailLogin() {
+        connection.sendEvent(AuthRequest.EmailLogin(email: email))
+        state = .EmailCodeSent
+    }
+    
+    func codeLogin() {
         connection.sendEvent(AuthRequest.EmailCodeValidation(email: email, code: code))
+        state = .VerifyingEmailCode
     }
 
     private func handleAuthResponse(_ event: AuthResponse) {
@@ -59,7 +68,7 @@ class RemoteLoginModel: ObservableObject, LoginModel {
                     print("Email code sent")
                 } else {
                     print("Email code send failed")
-                    self.state = .None
+                    self.state = .LoginFailed
                 }
             case .EmailCodeResponse(success: let success, sessionToken: let newSessionToken):
                 if (success) {
@@ -68,7 +77,7 @@ class RemoteLoginModel: ObservableObject, LoginModel {
                     self.state = .LoggedIn
                 } else {
                     print("Email code response: failed")
-                    self.state = .None
+                    self.state = .LoginFailed
                 }
             case .TokenLoginResponse(success: let success):
                 if (success) {
@@ -76,7 +85,7 @@ class RemoteLoginModel: ObservableObject, LoginModel {
                     self.state = .LoggedIn
                 } else {
                     print("Token login response: failed")
-                    self.state = .None
+                    self.state = .LoginFailed
                 }
         }
     }
