@@ -18,6 +18,33 @@ protocol SendableEvent: Encodable {
     static var eventType: String { get }
 }
 
+func eventToDict<E : SendableEvent>(_ event: E) -> [String: Any] {
+    do {
+        let initialDict = try event.asDictionary()
+        precondition(initialDict.keys.count == 1)
+        let action: String = initialDict.keys.first!
+        var content = initialDict[action]! as! [String : Any]
+        content["action"] = action
+        return content
+    } catch let error {
+        fatalError("Failed to serialize \(event): \(error)")
+    }
+}
+
+func eventFromDict<E: Decodable>(_ body: [String : Any]) throws -> E {
+    let action = body["action"] as! String
+    let withNestedStructure = [
+        action: body
+    ]
+    let data = try JSONSerialization.data(withJSONObject: withNestedStructure, options: .prettyPrinted)
+    let event: E = try JSONDecoder().decode(E.self, from: data)
+    return event
+}
+
+extension Notification.Name {
+    static let AppEvent = NSNotification.Name("AppEvent")
+}
+
 class SocketIOConnection: ObservableObject {
     private let manager: SocketManager
     private let socket: SocketIOClient
@@ -25,17 +52,10 @@ class SocketIOConnection: ObservableObject {
     let authResponses = PassthroughSubject<AuthResponse, Never>()
     
     func sendEvent<E : SendableEvent>(_ event: E) {
-        do {
-            let dict = try event.asDictionary()
-            precondition(dict.keys.count == 1)
-            let action: String = dict.keys.first!
-            var content = dict[action]! as! [String : Any]
-            content["action"] = action
-            print("### Sending \(content)")
-            socket.emit("message", E.eventType, content)
-        } catch let error {
-            print("### Failed to serialize \(event): \(error)")
-        }
+        let content = eventToDict(event)
+        print("### Sending \(content)")
+        socket.emit("message", E.eventType, content)
+        //NotificationCenter.default.publisher(for: .AppEvent).sink(receiveValue: { print($0)})
     }
 
     init() {
@@ -74,19 +94,9 @@ class SocketIOConnection: ObservableObject {
     
     func handleEvent<E: Decodable>(_ body: [String : Any], _ handler: (E) -> ()) {
         do {
-            handler(try decodeEvent(body))
+            handler(try eventFromDict(body))
         } catch let error {
             print("Error decoding event \(body): \(error)")
         }
-    }
-    
-    func decodeEvent<E: Decodable>(_ body: [String : Any]) throws -> E {
-        let action = body["action"] as! String
-        let withNestedStructure = [
-            action: body
-        ]
-        let data = try JSONSerialization.data(withJSONObject: withNestedStructure, options: .prettyPrinted)
-        let event: E = try JSONDecoder().decode(E.self, from: data)
-        return event
     }
 }

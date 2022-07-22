@@ -21,6 +21,7 @@
 		5B092F7C288A9FCF00D938B9 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7B288A9FCF00D938B9 /* LoginModel.swift */; };
 		5B092F7E288AA05100D938B9 /* AuthRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7D288AA05100D938B9 /* AuthRequest.swift */; };
 		5B092F80288AA05A00D938B9 /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7F288AA05A00D938B9 /* AuthResponse.swift */; };
+		5B092F83288ABDA200D938B9 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F81288ABDA200D938B9 /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		5B092F7B288A9FCF00D938B9 /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
 		5B092F7D288AA05100D938B9 /* AuthRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRequest.swift; sourceTree = "<group>"; };
 		5B092F7F288AA05A00D938B9 /* AuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthResponse.swift; sourceTree = "<group>"; };
+		5B092F82288ABDA200D938B9 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 				5B092F3228899D4C00D938B9 /* Assets.xcassets */,
 				5B092F4728899E4300D938B9 /* SocketIOConnection.swift */,
 				5B092F3428899D4C00D938B9 /* Preview Content */,
+				5B092F81288ABDA200D938B9 /* Model.xcdatamodeld */,
 			);
 			path = Ostax;
 			sourceTree = "<group>";
@@ -199,6 +202,7 @@
 				5B092F80288AA05A00D938B9 /* AuthResponse.swift in Sources */,
 				5B092F2F28899D4A00D938B9 /* OstaxApp.swift in Sources */,
 				5B092F7E288AA05100D938B9 /* AuthRequest.swift in Sources */,
+				5B092F83288ABDA200D938B9 /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,6 +423,19 @@
 			productName = SocketIO;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		5B092F81288ABDA200D938B9 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				5B092F82288ABDA200D938B9 /* Model.xcdatamodel */,
+			);
+			currentVersion = 5B092F82288ABDA200D938B9 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 5B092F2328899D4A00D938B9 /* Project object */;
 }
