@@ -47,20 +47,28 @@ struct LoginView<Model : LoginModel>: View {
 
 struct LoginView_Previews: PreviewProvider {
     class MockLoginModel: LoginModel {
-        var state: LoginState = .None
-        var email: String = ""
-        var code: String = ""
+        private func failLater() async {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            state = .LoginFailed
+        }
+        
+        @Published var state: LoginState = .None
+        @Published var email: String = ""
+        @Published var code: String = ""
         
         func restart() {
-            
+            state = .None
         }
         
         func codeLogin() {
-            
+            state = .VerifyingEmailCode
+            Task {
+                await failLater()
+            }
         }
         
         func emailLogin() {
-            
+            state = .EmailCodeSent
         }
     }
     static var previews: some View {
