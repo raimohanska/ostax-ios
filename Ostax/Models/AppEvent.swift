@@ -8,7 +8,9 @@ enum AppEvent {
 }
 
 
-extension AppEvent: Codable {
+extension AppEvent: Codable, SendableEvent {
+    static let eventType = "app-event"
+    
     enum CodingKeys: String, CodingKey {
         case ListsInit = "lists.init"
         case SuggestionsUpdate = "suggestions.update"

@@ -19,6 +19,42 @@ protocol LoginController {
     func codeLogin(email: String, code: String)
 }
 
+protocol SendableEvent: Encodable {
+    static var eventType: String { get }
+}
+
+enum AuthRequest {
+    case EmailLogin(email: String)
+    case EmailCodeValidation(email: String, code: String)
+    case TokenLogin(sessionToken: String)
+}
+
+extension AuthRequest: Codable, SendableEvent {
+    static let eventType = "auth-request"
+    
+    enum CodingKeys: String, CodingKey {
+        case EmailLogin = "email-login"
+        case EmailCodeValidation = "email-code-validation"
+        case TokenLogin = "token-login"
+    }
+}
+
+enum AuthResponse {
+    case Challenge
+    case EmailLoginResponse(success: Bool)
+    case EmailCodeResponse(success: Bool, sessionToken: String?)
+    case TokenLoginResponse(success: Bool)
+}
+
+extension AuthResponse: Codable {
+    enum CodingKeys: String, CodingKey {
+        case Challenge = "challenge"
+        case EmailCodeResponse = "email-code-response"
+        case EmailLoginResponse = "email-login-response"
+        case TokenLoginResponse = "token-login-response"
+    }
+}
+
 class SocketIOConnection: ObservableObject, LoginController {
     private let manager: SocketManager
     @Published var sessionToken: String? = UserDefaults.standard.string(forKey: "sessionToken") {
@@ -31,22 +67,14 @@ class SocketIOConnection: ObservableObject, LoginController {
     let appEvents = PassthroughSubject<AppEvent, Never>()
     
     func emailLogin(email: String) {
-        socket.emit("message", "auth-request", [
-            "action": "email-login",
-            "email": email
-        ])
+        sendEvent(AuthRequest.EmailLogin(email: email))
     }
     
     func codeLogin(email: String, code: String) {
-        socket.emit("message", "auth-request", [
-            "action": "email-code-validation",
-            "email": email,
-            "code": code
-        ])
+        sendEvent(AuthRequest.EmailCodeValidation(email: email, code: code))
     }
-
     
-    func sendEvent(_ event: AppEvent) {
+    func sendEvent<E : SendableEvent>(_ event: E) {
         do {
             let dict = try event.asDictionary()
             precondition(dict.keys.count == 1)
@@ -54,7 +82,7 @@ class SocketIOConnection: ObservableObject, LoginController {
             var content = dict[action]! as! [String : Any]
             content["action"] = action
             print("### Sending \(content)")
-            socket.emit("message", "app-event", content)
+            socket.emit("message", E.eventType, content)
         } catch let error {
             print("### Failed to serialize \(event): \(error)")
         }
@@ -80,52 +108,66 @@ class SocketIOConnection: ObservableObject, LoginController {
         socket.on("message") {[unowned self] data, ack in
             let kind = data[0] as! String
             let body = data[1] as! Dictionary<String, Any>
-            let action = body["action"] as! String
-            switch (kind, action) {
-            case ("auth-response", "challenge"):
-                print("### Auth challenge")
-                if sessionToken != nil {
-                    print("### Sending session token \(sessionToken)")
-                    socket.emit("message", "auth-request", [
-                        "action": "token-login",
-                        "sessionToken": sessionToken
-                    ])
+            
+            switch (kind) {
+            
+            case "auth-response":
+                handleEvent(body) { (event: AuthResponse) in
+                    switch (event) {
+                        case .Challenge:
+                            print("### Auth challenge")
+                            if let sessionToken = sessionToken {
+                                print("### Sending session token \(sessionToken)")
+                                sendEvent(AuthRequest.TokenLogin(sessionToken: sessionToken))
+                            }
+                        case .EmailLoginResponse(success: let success):
+                            if (success) {
+                                print("Email code sent")
+                            } else {
+                                print("Email code send failed")
+                            }
+                        case .EmailCodeResponse(success: let success, sessionToken: let newSessionToken):
+                            if (success) {
+                                print("Email code response: success")
+                                self.sessionToken = newSessionToken!
+                                self.loggedIn = true
+                            } else {
+                                print("Email code response: failed")
+                            }
+                        case .TokenLoginResponse(success: let success):
+                            if (success) {
+                                print("Token login response: success")
+                                self.loggedIn = true
+                            } else {
+                                print("Token login response: failed")
+                            }
+                    }
                 }
-            case ("auth-response", "email-code-response"):
-                let success = body["success"] as! Bool
-                if (success) {
-                    print("Email code response: success")
-                    self.sessionToken = body["sessionToken"] as! String
-                    self.loggedIn = true
-                    print("sessionToken: \(sessionToken)")
-                } else {
-                    print("Email code response: failed")
-                }
-            case ("auth-response", "token-login-response"):
-                let success = body["success"] as! Bool
-                if (success) {
-                    print("Token login response: success")
-                    self.loggedIn = true
-                } else {
-                    print("Token login response: failed")
-                }
-            case ("app-event", _):
-                let withNestedStructure = [
-                    action: body
-                ]
-                do {
-                    // Funny conversion to JSON data first before decode
-                    let data = try JSONSerialization.data(withJSONObject: withNestedStructure, options: .prettyPrinted)
-                    let appEvent: AppEvent = try JSONDecoder().decode(AppEvent.self, from: data)
-                    appEvents.send(appEvent)
-                } catch let error {
-                    print("Error decoding App event \(withNestedStructure): \(error)")
-                }
+            case "app-event":
+                handleEvent(body, appEvents.send(_:))
             default:
                 print("Ignoring message")
             }
         }
         
         socket.connect()
+    }
+    
+    func handleEvent<E: Decodable>(_ body: [String : Any], _ handler: (E) -> ()) {
+        do {
+            handler(try decodeEvent(body))
+        } catch let error {
+            print("Error decoding event \(body): \(error)")
+        }
+    }
+    
+    func decodeEvent<E: Decodable>(_ body: [String : Any]) throws -> E {
+        let action = body["action"] as! String
+        let withNestedStructure = [
+            action: body
+        ]
+        let data = try JSONSerialization.data(withJSONObject: withNestedStructure, options: .prettyPrinted)
+        let event: E = try JSONDecoder().decode(E.self, from: data)
+        return event
     }
 }
