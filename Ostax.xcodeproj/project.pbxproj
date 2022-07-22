@@ -18,6 +18,9 @@
 		5B092F76288A82E200D938B9 /* ShoppingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F75288A82E200D938B9 /* ShoppingList.swift */; };
 		5B092F78288A830100D938B9 /* AppEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F77288A830100D938B9 /* AppEvent.swift */; };
 		5B092F7A288A8BC100D938B9 /* ShoppingListsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F79288A8BC100D938B9 /* ShoppingListsModel.swift */; };
+		5B092F7C288A9FCF00D938B9 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7B288A9FCF00D938B9 /* LoginModel.swift */; };
+		5B092F7E288AA05100D938B9 /* AuthRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7D288AA05100D938B9 /* AuthRequest.swift */; };
+		5B092F80288AA05A00D938B9 /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7F288AA05A00D938B9 /* AuthResponse.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +35,9 @@
 		5B092F75288A82E200D938B9 /* ShoppingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingList.swift; sourceTree = "<group>"; };
 		5B092F77288A830100D938B9 /* AppEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEvent.swift; sourceTree = "<group>"; };
 		5B092F79288A8BC100D938B9 /* ShoppingListsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListsModel.swift; sourceTree = "<group>"; };
+		5B092F7B288A9FCF00D938B9 /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
+		5B092F7D288AA05100D938B9 /* AuthRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRequest.swift; sourceTree = "<group>"; };
+		5B092F7F288AA05A00D938B9 /* AuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +105,9 @@
 				5B092F75288A82E200D938B9 /* ShoppingList.swift */,
 				5B092F77288A830100D938B9 /* AppEvent.swift */,
 				5B092F79288A8BC100D938B9 /* ShoppingListsModel.swift */,
+				5B092F7B288A9FCF00D938B9 /* LoginModel.swift */,
+				5B092F7D288AA05100D938B9 /* AuthRequest.swift */,
+				5B092F7F288AA05A00D938B9 /* AuthResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -183,10 +192,13 @@
 				5B092F50288A6DC200D938B9 /* LoginView.swift in Sources */,
 				5B092F76288A82E200D938B9 /* ShoppingList.swift in Sources */,
 				5B092F7A288A8BC100D938B9 /* ShoppingListsModel.swift in Sources */,
+				5B092F7C288A9FCF00D938B9 /* LoginModel.swift in Sources */,
 				5B092F4B28899E4300D938B9 /* ShoppingListView.swift in Sources */,
 				5B092F4A28899E4300D938B9 /* SocketIOConnection.swift in Sources */,
 				5B092F4528899E3000D938B9 /* ShoppingListsView.swift in Sources */,
+				5B092F80288AA05A00D938B9 /* AuthResponse.swift in Sources */,
 				5B092F2F28899D4A00D938B9 /* OstaxApp.swift in Sources */,
+				5B092F7E288AA05100D938B9 /* AuthRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

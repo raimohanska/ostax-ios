@@ -2,21 +2,21 @@ import SwiftUI
 
 @main
 struct TestApp: App {
-    @ObservedObject var connection: SocketIOConnection
+    @ObservedObject var loginModel: RemoteLoginModel
     @ObservedObject var listModel: ShoppingListsModel
     
     init() {
         let newConnection: SocketIOConnection = .init()
-        connection = newConnection
         listModel = .init(connection: newConnection)
+        loginModel = RemoteLoginModel.init(connection: newConnection)
     }
 
     var body: some Scene {
         WindowGroup {
-            if connection.sessionToken != nil {
+            if loginModel.state == .LoggedIn {
                 ShoppingListsView(lists: listModel.lists, dispatch: listModel.dispatch(_:))
             } else {
-                LoginView(loginController: connection)
+                LoginView(loginModel: loginModel)
             }
         }
     }

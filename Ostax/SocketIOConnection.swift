@@ -14,65 +14,15 @@ extension Encodable {
   }
 }
 
-protocol LoginController {
-    func emailLogin(email: String)
-    func codeLogin(email: String, code: String)
-}
-
 protocol SendableEvent: Encodable {
     static var eventType: String { get }
 }
 
-enum AuthRequest {
-    case EmailLogin(email: String)
-    case EmailCodeValidation(email: String, code: String)
-    case TokenLogin(sessionToken: String)
-}
-
-extension AuthRequest: Codable, SendableEvent {
-    static let eventType = "auth-request"
-    
-    enum CodingKeys: String, CodingKey {
-        case EmailLogin = "email-login"
-        case EmailCodeValidation = "email-code-validation"
-        case TokenLogin = "token-login"
-    }
-}
-
-enum AuthResponse {
-    case Challenge
-    case EmailLoginResponse(success: Bool)
-    case EmailCodeResponse(success: Bool, sessionToken: String?)
-    case TokenLoginResponse(success: Bool)
-}
-
-extension AuthResponse: Codable {
-    enum CodingKeys: String, CodingKey {
-        case Challenge = "challenge"
-        case EmailCodeResponse = "email-code-response"
-        case EmailLoginResponse = "email-login-response"
-        case TokenLoginResponse = "token-login-response"
-    }
-}
-
-class SocketIOConnection: ObservableObject, LoginController {
+class SocketIOConnection: ObservableObject {
     private let manager: SocketManager
-    @Published var sessionToken: String? = UserDefaults.standard.string(forKey: "sessionToken") {
-        didSet {
-            UserDefaults.standard.set(sessionToken, forKey: "sessionToken")
-        }
-    }
     private let socket: SocketIOClient
-    var loggedIn: Bool = false
     let appEvents = PassthroughSubject<AppEvent, Never>()
-    
-    func emailLogin(email: String) {
-        sendEvent(AuthRequest.EmailLogin(email: email))
-    }
-    
-    func codeLogin(email: String, code: String) {
-        sendEvent(AuthRequest.EmailCodeValidation(email: email, code: code))
-    }
+    let authResponses = PassthroughSubject<AuthResponse, Never>()
     
     func sendEvent<E : SendableEvent>(_ event: E) {
         do {
@@ -110,39 +60,8 @@ class SocketIOConnection: ObservableObject, LoginController {
             let body = data[1] as! Dictionary<String, Any>
             
             switch (kind) {
-            
             case "auth-response":
-                handleEvent(body) { (event: AuthResponse) in
-                    switch (event) {
-                        case .Challenge:
-                            print("### Auth challenge")
-                            if let sessionToken = sessionToken {
-                                print("### Sending session token \(sessionToken)")
-                                sendEvent(AuthRequest.TokenLogin(sessionToken: sessionToken))
-                            }
-                        case .EmailLoginResponse(success: let success):
-                            if (success) {
-                                print("Email code sent")
-                            } else {
-                                print("Email code send failed")
-                            }
-                        case .EmailCodeResponse(success: let success, sessionToken: let newSessionToken):
-                            if (success) {
-                                print("Email code response: success")
-                                self.sessionToken = newSessionToken!
-                                self.loggedIn = true
-                            } else {
-                                print("Email code response: failed")
-                            }
-                        case .TokenLoginResponse(success: let success):
-                            if (success) {
-                                print("Token login response: success")
-                                self.loggedIn = true
-                            } else {
-                                print("Token login response: failed")
-                            }
-                    }
-                }
+                handleEvent(body, authResponses.send(_:))
             case "app-event":
                 handleEvent(body, appEvents.send(_:))
             default:
