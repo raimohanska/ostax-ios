@@ -1,4 +1,9 @@
+This is my first iOS SwiftUI app
+
 Status
 
-- Uses fixed login token, no login functionality yet
 - Only supports adding new items and reacting to external deletes (no completion etc)
+- Error handling missing
+- Refactoring needed: WebSocketConnection has it all now
+- No offline support
+- Etc
