@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 protocol LoginModel: ObservableObject {
     var state: LoginState { get }

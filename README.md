@@ -9,9 +9,15 @@ What I've learnt so far
 - Serializing Swift enums as JSON discriminated unions
 - Using Socket.IO client
 
-Status
+Required for MVP
 
-- Only supports adding and deleting items
-- Adding and renaming lists would be nice
-- Shopping mode and support for completion would be nice
-- Offline support in the works
+- Completion support / shopping mode
+
+More missing features
+
+- Edit item text
+- Maybe an Edit button for deletion instead of the Trash symbol
+- Connection status indicator
+- Proper offline support
+- Add, rename, remove list
+- Configure lists

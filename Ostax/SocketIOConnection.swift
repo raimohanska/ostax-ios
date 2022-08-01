@@ -46,10 +46,11 @@ extension Notification.Name {
 }
 
 class SocketIOConnection: ObservableObject {
-    private let manager: SocketManager
-    private let socket: SocketIOClient
+    private var manager: SocketManager!
+    private var socket: SocketIOClient!
     let appEvents = PassthroughSubject<AppEvent, Never>()
     let authResponses = PassthroughSubject<AuthResponse, Never>()
+    var connected = CurrentValueSubject<Bool, Never>(false)
     
     func sendEvent<E : SendableEvent>(_ event: E) {
         let content = eventToDict(event)
@@ -57,24 +58,49 @@ class SocketIOConnection: ObservableObject {
         socket.emit("message", E.eventType, content)
         //NotificationCenter.default.publisher(for: .AppEvent).sink(receiveValue: { print($0)})
     }
-
+    
     init() {
+        connect()
+    }
+    
+    private func reconnect() {
+        connected.send(false)
+        print("### Reconnecting...")
+        connect()
+    }
+
+    private func connect() {
         print("*** Initializing SocketIO")
-        manager = SocketManager(socketURL: URL(string: "https://ostax.herokuapp.com/")!, config: [.log(true), .compress, .forceWebsockets(true)])
+        let serverUrl = ProcessInfo.processInfo.environment["SERVER_URL"] ?? "https://ostax.herokuapp.com/"
+        manager = SocketManager(socketURL: URL(string: serverUrl)!, config: [
+            .log(false),
+            .compress,
+            .forceWebsockets(true),
+            .reconnects(true)
+        ])
+        print("*** Manager up")
         socket = manager.defaultSocket
-
-        socket.on(clientEvent: .connect) {data, ack in
+        print("*** Socket up")
+        
+        socket.on(clientEvent: .connect) {[unowned self] data, ack in
             print("*** Socket connected")
+            connected.send(true)
         }
         
-        socket.on(clientEvent: .disconnect) {data, ack in
+        socket.on(clientEvent: .disconnect) {[unowned self] data, ack in
             print("*** Socket disconnected")
+            reconnect()
         }
         
-        socket.on(clientEvent: .error) {data, ack in
+        socket.on(clientEvent: .error) {[unowned self] data, ack in
             print("*** Socket error")
+            reconnect()
         }
-
+        
+        socket.on(clientEvent: .statusChange) { [unowned self] data, ack in
+            print("*** Status change: \(socket.status)")
+        }
+        
         socket.on("message") {[unowned self] data, ack in
             let kind = data[0] as! String
             let body = data[1] as! Dictionary<String, Any>
@@ -89,7 +115,15 @@ class SocketIOConnection: ObservableObject {
             }
         }
         
-        socket.connect()
+        print("*** Socket connecting with handler...")
+        socket.connect(
+            withPayload: nil,
+            timeoutAfter: 5 /* seconds */,
+            withHandler: {[self] in
+                print("*** Failed to connect")
+                reconnect()
+            })
+        print("*** Socket connecting done")
     }
     
     func handleEvent<E: Decodable>(_ body: [String : Any], _ handler: (E) -> ()) {

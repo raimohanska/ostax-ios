@@ -7,10 +7,12 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 struct ShoppingListsView: View {
     var lists: [ShoppingList]
     let dispatch: Dispatch
+    @Binding var connected: Bool
     
     var body: some View {
         VStack() {
@@ -19,7 +21,7 @@ struct ShoppingListsView: View {
                     ForEach(lists) { list in ShoppingListView(list: list, dispatch: dispatch) }
                 }.toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        Text("Lists 🤣")
+                        Text("Ostax \(connected ? "🟢" : "🔴")")
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button(action: {}) {
@@ -44,10 +46,12 @@ struct ShoppingListsView_Previews: PreviewProvider {
             ShoppingItem(id: "2.3", name: "Circle saw"),
         ])
     ]
+    static var connected = CurrentValueSubject<Bool, Never>(true)
     static var previews: some View {
         Group {
             ShoppingListsView(lists: lists,
-                              dispatch: { item in print(item)}
+                              dispatch: { item in print(item)},
+                              connected: connected.binding
             )
         }
     }

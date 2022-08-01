@@ -22,6 +22,8 @@
 		5B092F7E288AA05100D938B9 /* AuthRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7D288AA05100D938B9 /* AuthRequest.swift */; };
 		5B092F80288AA05A00D938B9 /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F7F288AA05A00D938B9 /* AuthResponse.swift */; };
 		5B092F83288ABDA200D938B9 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5B092F81288ABDA200D938B9 /* Model.xcdatamodeld */; };
+		5B923FAE2897DEF700875A4A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 5B923FAD2897DEF700875A4A /* README.md */; };
+		5B923FB02897F28800875A4A /* CurrentValueBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B923FAF2897F28800875A4A /* CurrentValueBinding.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,8 @@
 		5B092F7D288AA05100D938B9 /* AuthRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRequest.swift; sourceTree = "<group>"; };
 		5B092F7F288AA05A00D938B9 /* AuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthResponse.swift; sourceTree = "<group>"; };
 		5B092F82288ABDA200D938B9 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		5B923FAD2897DEF700875A4A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		5B923FAF2897F28800875A4A /* CurrentValueBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentValueBinding.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +61,7 @@
 		5B092F2228899D4A00D938B9 = {
 			isa = PBXGroup;
 			children = (
+				5B923FAD2897DEF700875A4A /* README.md */,
 				5B092F2D28899D4A00D938B9 /* Ostax */,
 				5B092F2C28899D4A00D938B9 /* Products */,
 			);
@@ -80,6 +85,7 @@
 				5B092F4728899E4300D938B9 /* SocketIOConnection.swift */,
 				5B092F3428899D4C00D938B9 /* Preview Content */,
 				5B092F81288ABDA200D938B9 /* Model.xcdatamodeld */,
+				5B923FAF2897F28800875A4A /* CurrentValueBinding.swift */,
 			);
 			path = Ostax;
 			sourceTree = "<group>";
@@ -179,6 +185,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B923FAE2897DEF700875A4A /* README.md in Resources */,
 				5B092F3628899D4C00D938B9 /* Preview Assets.xcassets in Resources */,
 				5B092F3328899D4C00D938B9 /* Assets.xcassets in Resources */,
 			);
@@ -203,6 +210,7 @@
 				5B092F2F28899D4A00D938B9 /* OstaxApp.swift in Sources */,
 				5B092F7E288AA05100D938B9 /* AuthRequest.swift in Sources */,
 				5B092F83288ABDA200D938B9 /* Model.xcdatamodeld in Sources */,
+				5B923FB02897F28800875A4A /* CurrentValueBinding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
