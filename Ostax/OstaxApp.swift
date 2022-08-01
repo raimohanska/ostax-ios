@@ -16,9 +16,10 @@ struct TestApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if loginModel.state == .LoggedIn {
-                ShoppingListsView(lists: listModel.lists, dispatch: listModel.dispatch(_:), connected: connected.binding)
-            } else {
+            switch (loginModel.state) {
+            case .LoggedIn, .LoggingInWithToken:
+                ShoppingListsView(lists: listModel.lists, syncStatus: listModel.syncStatus, dispatch: listModel.dispatch(_:))
+            default:
                 LoginView(loginModel: loginModel)
             }
         }

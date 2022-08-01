@@ -13,11 +13,11 @@ Required for MVP
 
 - Completion support / shopping mode
 
-More missing features
+More missing features compared to Web UI
 
 - Edit item text
 - Maybe an Edit button for deletion instead of the Trash symbol
-- Connection status indicator
-- Proper offline support
 - Add, rename, remove list
 - Configure lists
+- Suggestions, autocomplete
+- Check for more message types not yet implemented

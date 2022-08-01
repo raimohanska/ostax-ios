@@ -12,7 +12,7 @@ protocol LoginModel: ObservableObject {
 }
 
 enum LoginState {
-    case None, LoggingIn, EmailCodeSent, VerifyingEmailCode, LoggedIn, LoginFailed
+    case None, LoggingInWithToken, EmailCodeSent, VerifyingEmailCode, LoggedIn, LoginFailed
 }
 
 class RemoteLoginModel: ObservableObject, LoginModel {
@@ -23,9 +23,9 @@ class RemoteLoginModel: ObservableObject, LoginModel {
         }
     }
     @Published var code: String = ""
-
+    private var challenged = false
     private let connection: SocketIOConnection
-    private var cancelable: Cancellable?
+    private var bag = Set<AnyCancellable>()
     private var sessionToken: String? = UserDefaults.standard.string(forKey: "sessionToken") {
         didSet {
             UserDefaults.standard.set(sessionToken, forKey: "sessionToken")
@@ -33,11 +33,13 @@ class RemoteLoginModel: ObservableObject, LoginModel {
     }
     
     init(connection: SocketIOConnection) {
-        state = sessionToken != nil ? .LoggingIn : .None
+        state = sessionToken != nil ? .LoggingInWithToken : .None
         self.connection = connection
-        cancelable = connection.authResponses.sink(receiveValue: { [self] value in
-            print("Processing auth response")
+        bag.insert(connection.authResponses.sink(receiveValue: { [self] value in
             handleAuthResponse(value)
+        }))
+        bag.insert(connection.connected.filter { $0 == false }.sink { [self] value in
+            challenged = false
         })
     }
     
@@ -61,8 +63,11 @@ class RemoteLoginModel: ObservableObject, LoginModel {
             case .Challenge:
                 print("### Auth challenge")
                 if let sessionToken = sessionToken {
-                    print("### Sending session token \(sessionToken)")
-                    connection.sendEvent(AuthRequest.TokenLogin(sessionToken: sessionToken))
+                    if !challenged { // To prevent double login. TODO: for unknow reason the server sees our connections twice, sending two challenges
+                        print("### Sending session token")
+                        connection.sendEvent(AuthRequest.TokenLogin(sessionToken: sessionToken))
+                        challenged = true
+                    }
                 }
             case .EmailLoginResponse(success: let success):
                 if (success) {

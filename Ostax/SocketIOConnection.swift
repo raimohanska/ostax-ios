@@ -52,10 +52,15 @@ class SocketIOConnection: ObservableObject {
     let authResponses = PassthroughSubject<AuthResponse, Never>()
     var connected = CurrentValueSubject<Bool, Never>(false)
     
-    func sendEvent<E : SendableEvent>(_ event: E) {
+    func sendEvent<E : SendableEvent>(_ event: E, _ onAck: (() -> ())? = nil) {
         let content = eventToDict(event)
-        print("### Sending \(content)")
-        socket.emit("message", E.eventType, content)
+        //print("### Sending \(content)")
+        socket.emitWithAck("message", E.eventType, content).timingOut(after: 60, callback: {
+            data in            
+            if let onAck = onAck {
+                onAck()
+            }
+        })
         //NotificationCenter.default.publisher(for: .AppEvent).sink(receiveValue: { print($0)})
     }
     
@@ -76,11 +81,9 @@ class SocketIOConnection: ObservableObject {
             .log(false),
             .compress,
             .forceWebsockets(true),
-            .reconnects(true)
+            .reconnects(false)
         ])
-        print("*** Manager up")
         socket = manager.defaultSocket
-        print("*** Socket up")
         
         socket.on(clientEvent: .connect) {[unowned self] data, ack in
             print("*** Socket connected")
@@ -95,10 +98,6 @@ class SocketIOConnection: ObservableObject {
         socket.on(clientEvent: .error) {[unowned self] data, ack in
             print("*** Socket error")
             reconnect()
-        }
-        
-        socket.on(clientEvent: .statusChange) { [unowned self] data, ack in
-            print("*** Status change: \(socket.status)")
         }
         
         socket.on("message") {[unowned self] data, ack in
@@ -116,6 +115,7 @@ class SocketIOConnection: ObservableObject {
         }
         
         print("*** Socket connecting with handler...")
+        
         socket.connect(
             withPayload: nil,
             timeoutAfter: 5 /* seconds */,

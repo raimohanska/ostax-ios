@@ -3,9 +3,10 @@
     <entity name="StoredAppEvent" representedClassName="StoredAppEvent" syncable="YES" codeGenerationType="class">
         <attribute name="action" optional="YES" attributeType="String"/>
         <attribute name="json" optional="YES" attributeType="String"/>
+        <attribute name="source" optional="YES" attributeType="String"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
     </entity>
     <elements>
-        <element name="StoredAppEvent" positionX="-45" positionY="0" width="128" height="74"/>
+        <element name="StoredAppEvent" positionX="-45" positionY="0" width="128" height="89"/>
     </elements>
 </model>

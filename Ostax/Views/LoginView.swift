@@ -4,8 +4,10 @@ struct LoginView<Model : LoginModel>: View {
     @ObservedObject var loginModel: Model
     
     var body: some View {
-        if loginModel.state == .LoggingIn || loginModel.state == .VerifyingEmailCode {
+        if (loginModel.state == .LoggingInWithToken) {
             Text("Logging in...")
+        } else if loginModel.state == .VerifyingEmailCode {
+            Text("Verifying code...")
         } else if loginModel.state == .LoginFailed {
             Text("Login failed")
             Button("Try again") {
